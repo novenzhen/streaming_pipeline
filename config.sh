@@ -18,3 +18,5 @@ sudo yum -y install python-pip
 sudo pip install --upgrade pip
 
 sudo pip install docker-compose
+
+sudo systemctl start docker
