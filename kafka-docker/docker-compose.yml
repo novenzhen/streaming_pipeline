@@ -9,7 +9,7 @@ services:
     ports:
       - "9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 130.202.88.205
+      KAFKA_ADVERTISED_HOST_NAME: 129.114.108.142
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
