@@ -1,4 +1,4 @@
-FROM jairamc/spark-kafka-streaming
+FROM rosafilgueira/spark
 
 # Pip
 RUN apt-get -y update && \

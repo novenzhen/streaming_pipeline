@@ -1,23 +1,21 @@
 version: '2'
 services:
-  kafka:
-    image: wurstmeister/kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_CREATE_TOPICS: "android:1:1,acceleration:1:1"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
-
+  kafka:
+    image: rosafilgueira/kakfa_docker
+    ports:
+      - "9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 129.114.108.142
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "android:1:1,acceleration:1:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
   master:
-    image: jairamc/spark-kafka-streaming
+    image: rosafilgueira/spark
     hostname: master
     environment:
       SPARK_HOME: /usr/local/spark
@@ -31,7 +29,7 @@ services:
     command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master -h master
 
   slave:
-    image: jairamc/spark-kafka-streaming
+    image: rosafilgueira/spark
     hostname: worker
     depends_on:
       - master
@@ -48,7 +46,7 @@ services:
     command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
 
   notebook:
-    build: .
+    image: rosafilgueira/spark_notebook
     environment:
       SPARK_OPTS: '--master=spark://master:7077'
     command: jupyter notebook --ip=0.0.0.0
