@@ -1,0 +1,33 @@
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+  kafka:
+    image: rosafilgueira/kakfa_docker
+    ports:
+      - "9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 129.114.108.142
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "text:4:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  cassandra:
+    image: cassandra:2.2.6
+  spark:
+    image: antlypls/spark:1.6.0
+    volumes:
+      - ./spark-consumer/build/libs:/app
+      - ./spark-consumer/script:/script
+    environment:
+        - MASTER=spark://129.114.108.142:7077
+    depends_on:
+      - kafka
+      - cassandra
+    ports:
+      - "4040:4040"
+      - "4041:4041"
+      - "4042:4042"
+    command: sleep infinity
