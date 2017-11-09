@@ -19,7 +19,7 @@ services:
     hostname: master
     environment:
       SPARK_HOME: /usr/local/spark
-      MASTER: spark://master:7077
+      MASTER: spark://129.114.108.142:7077
       SPARK_CONF_DIR: /usr/local/spark/conf
       SPARK_PUBLIC_DNS: localhost
     ports:
@@ -34,6 +34,7 @@ services:
     depends_on:
       - master
     environment:
+      MASTER: spark://129.114.108.142:7077
       SPARK_HOME: /usr/local/spark
       SPARK_CONF_DIR: /usr/local/spark/conf
       SPARK_WORKER_CORES: 2
