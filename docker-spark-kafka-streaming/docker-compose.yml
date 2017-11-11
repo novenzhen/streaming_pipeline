@@ -15,28 +15,30 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   master:
-    image: rosafilgueira/spark
+    image: jupyter/pyspark-notebook
     hostname: master
     environment:
-      SPARK_HOME: /usr/local/spark
-      MASTER: spark://129.114.108.142:7077
-      SPARK_CONF_DIR: /usr/local/spark/conf
+      MASTER: spark://master:7077
+      SPARK_CONF_DIR: /conf
       SPARK_PUBLIC_DNS: localhost
     ports:
+      - 4040:4040
       - 8080:8080
       - 7077:7077
       - 6066:6066
+      - 10000:10000
+    volumes:
+      - ./conf/master:/conf
+      - ./data:/home/jovyan/work
     command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master -h master
 
   slave:
-    image: rosafilgueira/spark
+    image: jupyter/pyspark-notebook
     hostname: worker
     depends_on:
       - master
     environment:
-      MASTER: spark://129.114.108.142:7077
-      SPARK_HOME: /usr/local/spark
-      SPARK_CONF_DIR: /usr/local/spark/conf
+      SPARK_CONF_DIR: /conf
       SPARK_WORKER_CORES: 2
       SPARK_WORKER_MEMORY: 1g
       SPARK_WORKER_PORT: 8881
@@ -44,14 +46,21 @@ services:
       SPARK_PUBLIC_DNS: localhost
     ports:
       - 8081:8081
+    volumes:
+      - ./conf/worker:/conf
+      - ./data:/home/jovyan/work
     command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
 
   notebook:
-    image: rosafilgueira/spark_notebook
+    image: jupyter/pyspark-notebook
+    hostname: jupyter
+    depends_on:
+      - master
     environment:
-      SPARK_OPTS: '--master=spark://master:7077'
-    command: jupyter notebook --ip=0.0.0.0
+      SPARK_CONF_DIR: /conf
     ports:
       - 8888:8888
     volumes:
-      - ./notebooks:/notebooks
+      - ./data:/home/jovyan/work
+    command: "start-notebook.sh --NotebookApp.token=''"
+
