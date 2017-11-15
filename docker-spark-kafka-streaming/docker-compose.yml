@@ -15,7 +15,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   master:
-    image: jupyter/pyspark-notebook
+    image: jupyter/all-spark-notebook
     hostname: master
     environment:
       MASTER: spark://129.114.108.142:7077
@@ -40,13 +40,8 @@ services:
       - ./data:/home/jovyan/work
     command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master -h master
   
-  cassandra:
-    image: cassandra:2.2.0
-    hostname: cassandra
-    ports:
-      - "9042:9042"
   slave:
-    image: jupyter/pyspark-notebook
+    image: jupyter/all-spark-notebook
     hostname: worker
     depends_on:
       - master
@@ -77,9 +72,11 @@ services:
     
 
   notebook:
-    image: jupyter/pyspark-notebook
+    image: jupyter/all-spark-notebook
     hostname: jupyter
     depends_on:
+      - master
+    links:
       - master
     ports:
       - 8888:8888
@@ -87,3 +84,8 @@ services:
       - ./data:/home/jovyan/work
     command: "start-notebook.sh --NotebookApp.token=''"
 
+  cassandra:
+    image: cassandra:2.2.0
+    hostname: cassandra
+    ports:
+      - "9042:9042"
